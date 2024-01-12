@@ -1,0 +1,83 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: action
+name: kuberenetes resource actions
+inputs:
+  file-path:  # id of input
+    description: 'kuberenetes file path'
+    required: true
+  environment-variables:  # id of input
+    description: 'parameters as json (Optional if environment-variables-path is provided)'
+    required: false
+    default: '{}'
+  environment-variables-path:  # id of input
+    description: 'kuberenetes  environment variables path (Optional if environment-variables is provided)'
+    required: false
+    default: ''
+  namespace :  
+    description : 'name space'
+    required: false
+    default: '' 
+
+outputs:
+  kuberenetes-file:
+    value: ${{ steps.kuberenetes-render.outputs.kuberenetes-file }}
+    description: kuberenetes yaml file
+  
+  
+runs:
+  using: composite
+  steps:
+    - id: kuberenetes-render
+      name: invoke-kubernetes-job
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/kubernetes-resource-actions:main-0b6049b176b48f305940d18be66c42e2683516e1
+      shell: sh
+      env:
+        CONFIG_JSON: '{"metaInfo":{"toolType":"KUBERENETES_ACTIONS","filePath":"${{ inputs.file-path }}","environmentVariables":${{ inputs.environment-variables }},"environmentVariablesPath":"${{ inputs.environment-variables-path }}"}}'
+      run: |
+        set -x
+        cd /app
+        ./kuberenetes_actions_app invoke -i $CONFIG_JSON
+        
+    - id: kuberenetes-deploy
+      name: kuberenetes-deploy
+      uses: docker://alpine/k8s:1.27.3
+      run: |
+        set +x
+
+        # Check if the file is empty
+        if [ -z "${{ steps.kuberenetes-render.outputs.kuberenetes-file }}" ]; then
+            echo "The file is empty."
+            exit 1
+        else
+            echo "The file is not empty."
+        fi
+        
+        # File path
+        file_path="./updated_yaml.txt"
+        
+        # Value to be written to the file
+        value="${{ steps.kuberenetes-render.outputs.kuberenetes-file }}"
+
+        # Write the value to the file
+        echo "$value" > "$file_path"
+
+        # Check if the file exists
+        if [ -e "$file_path" ]; then
+            echo "Printing the content of the file:"
+            cat "$file_path"
+        else
+            echo "File '$file_path' does not exist."
+            exit 1
+        fi
+
+        echo "namespace ${{ inputs.namespace }}"
+        if [ ! -z "${{ inputs.namespace }}" ]; then
+          aws_args+=("-n ${{ inputs.namespace }}")
+        fi
+
+        args_string="${aws_args[@]}"
+        echo "Applying the file-path Started"
+        kubectl apply -f $file_path $args_string
+        echo "Applying the file-path Completed"
+
+

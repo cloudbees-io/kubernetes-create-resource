@@ -1,0 +1,63 @@
+= CloudBees action: Create or update a Kubernetes resource file
+
+Use this action to create or update a Kubernetes resource file, which groups multiple resources for your application in a single YAML file.
+
+== Inputs
+
+[cols="2a,1a,1a,3a",options="header"]
+.Input details
+|===
+
+| Input name
+| Data type
+| Required?
+| Description
+
+| `file-path`
+| String
+| Yes
+| The path of the Kubernetes resource file to be created/updated.
+
+| `environment-variables`
+| JSON string
+| Required only if `environment-variables-path` is not specified.
+| The environment key-value pairs.
+
+| `environment-variables-path`
+| String
+| Required only if `environment-variables` is not specified.
+| The path of the file containing the environment variables.
+
+| `namespace`
+| String
+| No
+| The namespace where the created/updated Kubernetes resource file is located.
+
+|===
+
+== Usage examples
+
+In your YAML file, add:
+
+[source,yaml]
+----
+
+      - name: Create or update a Kubernetes resource
+        uses: cloudbees-io/kubernetes-create-resource@v1
+        with:
+          file-path: ${{ cloudbees.workspace }}/input.yml
+          environment-variables: '{"IMAGE_NAME":"nginx:latest","CUSTOM_VALUE":"alpine:latest","port":"80"}'
+          environment-variables-path: ${{ cloudbees.workspace }}/sample.json
+          namespace: my-namespace
+
+----
+
+== License
+
+This code is made available under the 
+link:https://opensource.org/license/mit/[MIT license].
+
+== References
+
+* Learn more about link:https://docs.cloudbees.com/docs/cloudbees-saas-platform-actions/latest/[using actions in CloudBees workflows].
+* Learn about link:https://docs.cloudbees.com/docs/cloudbees-saas-platform/latest/[the CloudBees platform].
