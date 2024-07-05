@@ -29,7 +29,7 @@ runs:
   steps:
     - id: kuberenetes-render
       name: invoke-kubernetes-job
-      uses: docker://public.ecr.aws/l7o7z1g8/actions/kubernetes-resource-actions:main-bb8d0b2d41a26451ae51eb0c7e1e49aa4f76e224
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/kubernetes-resource-actions:main-2fcafb6ddffbb98d3f8a986765ca8e6a9d165b29
       shell: sh
       env:
         CONFIG_JSON: '{"metaInfo":{"toolType":"KUBERENETES_ACTIONS","filePath":"${{ inputs.file-path }}","environmentVariables":${{ inputs.environment-variables }},"environmentVariablesPath":"${{ inputs.environment-variables-path }}"}}'
