@@ -29,7 +29,7 @@ runs:
   steps:
     - id: kuberenetes-render
       name: invoke-kubernetes-job
-      uses: docker://public.ecr.aws/l7o7z1g8/actions/kubernetes-resource-actions:main-6ebc0c5ff76d869a8e3f974b59e97835bfc7e9da
+      uses: docker://public.ecr.aws/l7o7z1g8/actions/kubernetes-resource-actions:main-00bc0c5ff76d869a8e3f974b59e97835bfc7e9da
       shell: sh
       env:
         CONFIG_JSON: '{"metaInfo":{"toolType":"KUBERENETES_ACTIONS","filePath":"${{ inputs.file-path }}","environmentVariables":${{ inputs.environment-variables }},"environmentVariablesPath":"${{ inputs.environment-variables-path }}"}}'
@@ -79,5 +79,3 @@ runs:
         echo "Applying the file-path Started"
         kubectl apply -f $file_path $args_string
         echo "Applying the file-path Completed"
-
-
